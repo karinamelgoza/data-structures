@@ -1,5 +1,7 @@
 """Functions to parse a file containing student data."""
 
+filename = 'cohort_data.txt'
+
 
 def all_houses(filename):
     """Return a set of all house names in the given file.
@@ -15,9 +17,17 @@ def all_houses(filename):
       - set[str]: a set of strings
     """
 
+    f = open(filename)
+    raw_data = f.read().splitlines()
+
     houses = set()
 
-    # TODO: replace this with your code
+    for i in raw_data:
+        individual = i.split('|')
+        if individual[2] != '':
+            houses.add(individual[2])
+
+    f.close()
 
     return houses
 
@@ -49,10 +59,26 @@ def students_by_cohort(filename, cohort='All'):
     Return:
       - list[list]: a list of lists
     """
+    f = open(filename)
+    raw_data = f.read().splitlines()
 
     students = []
+    all_students = []
+    cohort_arg = cohort
 
-    # TODO: replace this with your code
+    for i in raw_data:
+        individual = i.split('|')
+        if individual[4] != 'I' and individual[4] != 'G':
+            all_students.append(individual)
+
+    for student in all_students:
+        ind_cohort = student[4]
+        if ind_cohort == cohort_arg:
+            students.append(student[0]+' ' + student[1])
+        elif cohort_arg == 'All':
+            students.append(student[0]+' ' + student[1])
+
+    f.close()
 
     return sorted(students)
 
@@ -87,6 +113,8 @@ def all_names_by_house(filename):
     Return:
       - list[list]: a list of lists
     """
+    f = open(filename)
+    raw_data = f.read().splitlines()
 
     dumbledores_army = []
     gryffindor = []
@@ -96,9 +124,29 @@ def all_names_by_house(filename):
     ghosts = []
     instructors = []
 
-    # TODO: replace this with your code
+    for i in raw_data:
+        individual = i.split('|')
+        if individual[2] == "Dumbledore's Army":
+            dumbledores_army.append(individual[0]+' ' + individual[1])
+        elif individual[2] == "Gryffindor":
+            gryffindor.append(individual[0]+' ' + individual[1])
+        elif individual[2] == "Hufflepuff":
+            hufflepuff.append(individual[0]+' ' + individual[1])
+        elif individual[2] == "Ravenclaw":
+            ravenclaw.append(individual[0]+' ' + individual[1])
+        elif individual[2] == "Slytherin":
+            slytherin.append(individual[0]+' ' + individual[1])
+        elif individual[4] == "G":
+            ghosts.append(individual[0]+' ' + individual[1])
+        elif individual[4] == "I":
+            instructors.append(individual[0]+' ' + individual[1])
 
-    return []
+    roster = [sorted(dumbledores_army), sorted(gryffindor), sorted(hufflepuff), sorted(
+        ravenclaw), sorted(slytherin), sorted(ghosts), sorted(instructors)]
+
+    f.close()
+
+    return roster
 
 
 def all_data(filename):
@@ -119,10 +167,17 @@ def all_data(filename):
     Return:
       - list[tuple]: a list of tuples
     """
+    f = open(filename)
+    raw_data = f.read().splitlines()
 
     all_data = []
 
-    # TODO: replace this with your code
+    for i in raw_data:
+        individual = i.split('|')
+        all_data.append(
+            (individual[0] + ' ' + individual[1], individual[2], individual[3], individual[4]))
+
+    f.close()
 
     return all_data
 
@@ -148,7 +203,16 @@ def get_cohort_for(filename, name):
       - str: the person's cohort or None
     """
 
-    # TODO: replace this with your code
+    f = open(filename)
+    raw_data = f.read().splitlines()
+
+    name_input = name
+    for i in raw_data:
+        individual = i.split('|')
+        if name_input == individual[0] + ' ' + individual[1]:
+            return individual[4]
+
+    f.close()
 
 
 def find_duped_last_names(filename):
@@ -165,7 +229,22 @@ def find_duped_last_names(filename):
       - set[str]: a set of strings
     """
 
-    # TODO: replace this with your code
+    f = open(filename)
+    raw_data = f.read().splitlines()
+    f.close()
+    last = []
+    uniq = []
+    dup = set()
+    for i in raw_data:
+        individual = i.split('|')
+        last.append(individual[1])
+
+    for last_name in last:
+        if last_name not in uniq:
+            uniq.append(last_name)
+        else:
+            dup.add(last_name)
+    return dup
 
 
 def get_housemates_for(filename, name):
@@ -180,12 +259,32 @@ def get_housemates_for(filename, name):
     {'Angelina Johnson', ..., 'Seamus Finnigan'}
     """
 
-    # TODO: replace this with your code
+    f = open(filename)
+    raw_data = f.read().splitlines()
+    f.close()
 
+    name_input = name
+    students = {}
+    for i in raw_data:
+        individual = i.split('|')
+        students[individual[0] + ' ' + individual[1]] = individual[2:]
+
+    housemates = set()
+    # print(students[name_input])
+
+    for key in students:
+        # print(key)
+        if students[key][0] == students[name_input][0] and students[key][2] == students[name_input][2]:
+            housemates.add(key)
+
+    housemates.remove(name_input)
+
+    return housemates
 
 ##############################################################################
 # END OF MAIN EXERCISE.  Yay!  You did it! You Rock!
 #
+
 
 if __name__ == '__main__':
     import doctest
